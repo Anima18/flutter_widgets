@@ -6,6 +6,8 @@ import 'package:flutter_widgets/element/animation/example/steps_widget_animation
 import 'animatedbuilder/system_explicit_animated_page.dart';
 import 'animatedfoo/animated_foo.dart';
 import 'animation/custom_animated_page2.dart';
+import 'example/478_animation.dart';
+import 'example/snowman_animated_page.dart';
 import 'hero/hero_page.dart';
 
 class CustomAnimatedPage extends StatelessWidget {
@@ -91,6 +93,24 @@ class CustomAnimatedPage extends StatelessWidget {
                 child: Text("交错动画",),
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(builder: (_)=>StepsAnimationPage()));
+                },
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              child: OutlinedButton(
+                child: Text("478呼吸动画",),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_)=>BreatheAnimationPage()));
+                },
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              child: OutlinedButton(
+                child: Text("堆雪人动画",),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_)=>SnowmanAnimatedPage()));
                 },
               ),
             ),
