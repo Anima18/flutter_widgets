@@ -45,7 +45,9 @@ class _BreatheAnimationPageState extends State<BreatheAnimationPage>
             TickerFuture tickerFuture  = _controller.repeat();
             tickerFuture.timeout(Duration(seconds:  19 * 2), onTimeout:  () {
               //_animationController.forward(from: 0);
-              _controller.stop(canceled: true);
+              if(_controller.isAnimating) {
+                _controller.stop(canceled: true);
+              }
               print("================");
             });
           }

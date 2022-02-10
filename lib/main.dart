@@ -12,6 +12,7 @@ import 'package:flutter_widgets/custom/actionBar_test.dart';
 import 'package:flutter_widgets/custom/menuGroup_test.dart';
 import 'package:flutter_widgets/element/animation/animatedbuilder/animated_builder.dart';
 import 'package:flutter_widgets/element/animation/animation/custom_animated_page.dart';
+import 'package:flutter_widgets/element/game/game_list.dart';
 import 'package:flutter_widgets/element/media/icon_widget.dart';
 import 'package:flutter_widgets/learning/draw/03/03_canvas_page.dart';
 import 'package:flutter_widgets/learning/draw/03/05_canvas_page.dart';
@@ -213,6 +214,7 @@ class MyApp extends StatelessWidget {
         'animation_page': (context) => AnimationPage(),
         'animated_widget': (context) => AnimationWidget(),
         'animated_builder': (context) => AnimatedBuilderPage(),
+        'games': (context) => GameListPage(),
         'navigation_widget': (context) => NavigationWidget(),
         'listView_widget': (context) => ListViewDemoWidget(),
         'bar_main': (context) => BarMain(),
@@ -398,6 +400,7 @@ class _MyHomePageState extends State<MyHomePage> {
               itemView(context, "Frame", "frame_main"),
               itemView(context, "Media", "media_main"),
               itemView(context, "Animation", "animation_list"),
+              itemView(context, "games", "games"),
 
               SizedBox(height: 24,),
               Text(
