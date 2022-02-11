@@ -16,6 +16,8 @@ class _ColorSortedPage2State extends State<ColorSortedPage2> {
   late GlobalKey _globalKey = new GlobalKey();
   late double _offsetY;
 
+  int executeSep = 0;
+
   @override
   void initState() {
     super.initState();
@@ -40,18 +42,25 @@ class _ColorSortedPage2State extends State<ColorSortedPage2> {
             title: Text("恭喜"),
             content: Text("完成目标,进入下一关!"),
             actions: [
-              TextButton(onPressed: () {
-                setState(() {
-                  baseColor = Colors.primaries[Random().nextInt(Colors.primaries.length)];
-                  _colors = List.generate(8, (index) => baseColor[(index + 1) * 100]!);
-                  _colors.shuffle();
-                });
-                Navigator.of(context).pop();
-              }, child: Text("确认")),
-              TextButton(onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              }, child: Text("退出")),
+              TextButton(
+                  onPressed: () {
+                    setState(() {
+                      baseColor = Colors
+                          .primaries[Random().nextInt(Colors.primaries.length)];
+                      _colors = List.generate(
+                          8, (index) => baseColor[(index + 1) * 100]!);
+                      _colors.shuffle();
+                      executeSep = 0;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("确认")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("退出")),
             ],
           );
         },
@@ -70,26 +79,29 @@ class _ColorSortedPage2State extends State<ColorSortedPage2> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("长按拖动从浅到深排序:"),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text("长按拖动从浅到深排序, 你执行的$executeSep步"),
+          ),
           Expanded(
             child: Listener(
               onPointerMove: (PointerMoveEvent event) {
                 print("=======$event=====");
                 double y = event.position.dy - _offsetY;
-                if(y > (currentDragIndex +1)*Box.height) {
-                  if(currentDragIndex == _colors.length-1) return;
+                if (y > (currentDragIndex + 1) * Box.height) {
+                  if (currentDragIndex == _colors.length - 1) return;
                   setState(() {
                     var newColor = _colors[currentDragIndex];
-                    _colors[currentDragIndex] = _colors[currentDragIndex+1];
-                    _colors[currentDragIndex+1] = newColor;
+                    _colors[currentDragIndex] = _colors[currentDragIndex + 1];
+                    _colors[currentDragIndex + 1] = newColor;
                     currentDragIndex++;
                   });
-                }else if(y < currentDragIndex*Box.height) {
-                  if(currentDragIndex == 0) return;
+                } else if (y < currentDragIndex * Box.height) {
+                  if (currentDragIndex == 0) return;
                   setState(() {
                     var newColor = _colors[currentDragIndex];
-                    _colors[currentDragIndex] = _colors[currentDragIndex-1];
-                    _colors[currentDragIndex-1] = newColor;
+                    _colors[currentDragIndex] = _colors[currentDragIndex - 1];
+                    _colors[currentDragIndex - 1] = newColor;
                     currentDragIndex--;
                   });
                 }
@@ -107,8 +119,14 @@ class _ColorSortedPage2State extends State<ColorSortedPage2> {
                           onDrag: (position) {
                             currentDragIndex = position;
 
-                            final renderBox = _globalKey.currentContext?.findRenderObject() as RenderBox;
+                            final renderBox = _globalKey.currentContext
+                                ?.findRenderObject() as RenderBox;
                             _offsetY = renderBox.localToGlobal(Offset.zero).dy;
+                          },
+                          onDragCompleted: () {
+                            setState(() {
+                              executeSep += 1;
+                            });
                           },
                         )),
               ),
@@ -128,13 +146,15 @@ class Box extends StatelessWidget {
   final int index;
   final double x;
 
-  final Function(int ) onDrag;
+  final Function(int) onDrag;
+  final Function() onDragCompleted;
 
   Box(
       {Key? key,
       required this.color,
       required this.index,
       required this.onDrag,
+      required this.onDragCompleted,
       required this.x})
       : super(key: key);
 
@@ -146,6 +166,7 @@ class Box extends StatelessWidget {
       left: x,
       child: Draggable(
         onDragStarted: () => onDrag(index),
+        onDragEnd: (_) => onDragCompleted() ,
         feedback: Container(
           height: height - margin * 2,
           width: width,
