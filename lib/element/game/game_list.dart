@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/element/game/color_sorted_page2.dart';
 
-import 'arithmetic_game_page.dart';
+import 'arithmetic/arithmetic_game_page.dart';
 import 'color_sorted_page.dart';
 
 class GameListPage extends StatelessWidget {

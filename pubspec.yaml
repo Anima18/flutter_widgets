@@ -30,8 +30,9 @@ dependencies:
   cupertino_icons: ^1.0.0
   english_words: 3.1.5
   provider: ^5.0.0
-  matrioska:
-    path: ../../flutter_package/matrioska
+#  matrioska:
+#    path: ../../flutter_package/matrioska
+  matrioska: ^0.1.6
   #网络状态监听
   connectivity_plus: ^2.2.0
   #数据库
@@ -54,7 +55,7 @@ dependencies:
   #Rxdart
   rxdart: ^0.26.0-nullsafety.1
   #权限申请
-  permission_handler: ^8.1.2
+  permission_handler: ^8.3.0
 
 dev_dependencies:
   flutter_test:

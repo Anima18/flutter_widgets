@@ -6,22 +6,18 @@ import 'package:flutter_widgets/util/hex_color.dart';
 
 import 'arithmetic_expression.dart';
 
-// ignore: must_be_immutable
-class ArithmeticGamePage extends StatefulWidget {
-  late List<ArithmeticExpression> expression;
 
-  ArithmeticGamePage() {
-    expression = List.generate(
-        10,
-        (index) => ArithmeticExpression(
-            Random().nextInt(5), Random().nextInt(5), Operator.add)).toList();
-  }
+// ignore: must_be_immutable
+class ArithmeticPlayPage extends StatefulWidget {
+  final ArithmeticStrategy strategy;
+
+  ArithmeticPlayPage(this.strategy);
 
   @override
-  _ArithmeticGamePageState createState() => _ArithmeticGamePageState();
+  _ArithmeticPlayPageState createState() => _ArithmeticPlayPageState();
 }
 
-class _ArithmeticGamePageState extends State<ArithmeticGamePage> {
+class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
   late StreamController<int> _inputController;
   late StreamController<int> _successController;
   late StreamController<int> _errorController;
@@ -81,13 +77,13 @@ class _ArithmeticGamePageState extends State<ArithmeticGamePage> {
       body: Stack(
         children: [
           ...List.generate(
-              4,
+              widget.strategy.puzzleCount,
               (index) => Puzzle(
                     inputStream: _inputController.stream,
                     successController: _successController,
                     errorController: _errorController,
                     completeController: _completeController,
-                    expression: widget.expression,
+                    strategy: widget.strategy,
                   )).toList(),
           Align(
             alignment: Alignment.bottomCenter,
@@ -140,13 +136,13 @@ class Puzzle extends StatefulWidget {
   final StreamController<int> successController;
   final StreamController<int> errorController;
   final StreamController<int> completeController;
-  final List<ArithmeticExpression> expression;
+  final ArithmeticStrategy strategy;
 
   Puzzle(
       {required this.inputStream,
       required this.successController,
       required this.errorController,
-      required this.expression,
+      required this.strategy,
       required this.completeController});
 
   @override
@@ -161,7 +157,7 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
   late double left;
 
   _reset() {
-    expression = widget.expression.removeLast();
+    expression = widget.strategy.expressions.removeLast();
     left = Random().nextDouble() * 300;
     _backgroundColor =
         Colors.primaries[Random().nextInt(Colors.primaries.length)][200]!;
@@ -171,7 +167,7 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 5));
+        AnimationController(vsync: this, duration: Duration(seconds: widget.strategy.duration));
 
     _reset();
     Future.delayed(Duration(milliseconds: 200 * Random().nextInt(10)), () {
@@ -182,7 +178,7 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
       if (_controller.status == AnimationStatus.completed) {
         _controller.forward(from: 0.0);
         widget.errorController.add(1);
-        if (widget.expression.length > 0) {
+        if (widget.strategy.expressions.length > 0) {
           _reset();
         } else {
           _complete();
@@ -191,16 +187,26 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
     });
 
     widget.inputStream.listen((int event) {
-      if (event == (expression.a + expression.b)) {
+      if (_checkSuccess(event, expression)) {
         _controller.forward(from: 0.0);
         widget.successController.add(1);
-        if (widget.expression.length > 0) {
+        if (widget.strategy.expressions.length > 0) {
           _reset();
         } else {
           _complete();
         }
       }
     });
+  }
+
+  bool _checkSuccess(int value, ArithmeticExpression expression) {
+    if(expression.operator == Operator.add) {
+      return value == (expression.a + expression.b);
+    }else if(expression.operator == Operator.reduce) {
+      return value == (expression.a - expression.b);
+    }else {
+      return false;
+    }
   }
 
   void _complete() {
@@ -231,7 +237,7 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
                   color: _backgroundColor.withOpacity(0.5),
                   borderRadius: const BorderRadius.all(Radius.circular(16))),
               child: Text(
-                "${expression.a} + ${expression.b}",
+                "${expression.a} ${OperatorValue.getValue(expression.operator)} ${expression.b}",
                 style: TextStyle(fontSize: 20),
               ),
             ),
