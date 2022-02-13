@@ -6,7 +6,6 @@ import 'package:flutter_widgets/util/hex_color.dart';
 
 import 'arithmetic_expression.dart';
 
-
 // ignore: must_be_immutable
 class ArithmeticPlayPage extends StatefulWidget {
   final ArithmeticStrategy strategy;
@@ -35,14 +34,16 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
     _completeController = StreamController();
     _completeController.stream.listen((event) {
       completePuzzleCount += event;
-      if(completePuzzleCount == 4) {
-        _ScoreTipWidgetState scoreState = scoreTipKey.currentState as _ScoreTipWidgetState;
+      if (completePuzzleCount == 4) {
+        _ScoreTipWidgetState scoreState =
+            scoreTipKey.currentState as _ScoreTipWidgetState;
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("完成"),
-              content: Text("你答对了${scoreState.successCount}条,答错了${scoreState.errorCount}条"),
+              content: Text(
+                  "你答对了${scoreState.successCount}条,答错了${scoreState.errorCount}条"),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -71,12 +72,15 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            ScoreTipWidget(successStream: _successController.stream, errorStream: _errorController.stream, key: scoreTipKey,),
+        title: ScoreTipWidget(
+          successStream: _successController.stream,
+          errorStream: _errorController.stream,
+          key: scoreTipKey,
+        ),
       ),
       body: Stack(
         children: [
-          ...List.generate(
+          /*...List.generate(
               widget.strategy.puzzleCount,
               (index) => Puzzle(
                     inputStream: _inputController.stream,
@@ -85,6 +89,36 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
                     completeController: _completeController,
                     strategy: widget.strategy,
                   )).toList(),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Keyboard(_inputController),
+          )*/
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF96E3FF),
+                  Color(0xFF9EECFF),
+                  Color(0xFF9FEBFF),
+                  Color(0xFF9FEEFF),
+                  Color(0xFF9FECFF),
+                ],
+              ),
+              image: DecorationImage(
+                image: AssetImage('images/meditation.jpg'),
+                alignment: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          ...List.generate(
+              widget.strategy.puzzleCount,
+                  (index) => Puzzle(
+                inputStream: _inputController.stream,
+                successController: _successController,
+                errorController: _errorController,
+                completeController: _completeController,
+                strategy: widget.strategy,
+              )).toList(),
           Align(
             alignment: Alignment.bottomCenter,
             child: Keyboard(_inputController),
@@ -99,7 +133,9 @@ class ScoreTipWidget extends StatefulWidget {
   final Stream<int> successStream;
   final Stream<int> errorStream;
 
-  ScoreTipWidget({Key? key, required this.successStream, required this.errorStream}) : super(key: key);
+  ScoreTipWidget(
+      {Key? key, required this.successStream, required this.errorStream})
+      : super(key: key);
 
   @override
   _ScoreTipWidgetState createState() => _ScoreTipWidgetState();
@@ -166,8 +202,8 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: widget.strategy.duration));
+    _controller = AnimationController(
+        vsync: this, duration: Duration(seconds: widget.strategy.duration));
 
     _reset();
     Future.delayed(Duration(milliseconds: 200 * Random().nextInt(10)), () {
@@ -200,11 +236,11 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
   }
 
   bool _checkSuccess(int value, ArithmeticExpression expression) {
-    if(expression.operator == Operator.add) {
+    if (expression.operator == Operator.add) {
       return value == (expression.a + expression.b);
-    }else if(expression.operator == Operator.reduce) {
+    } else if (expression.operator == Operator.reduce) {
       return value == (expression.a - expression.b);
-    }else {
+    } else {
       return false;
     }
   }
@@ -260,7 +296,7 @@ class _KeyboardState extends State<Keyboard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: HexColor.fromHex("#f2f3f6"),
+      //color: HexColor.fromHex("#f2f3f6"),
       height: MediaQuery.of(context).size.width * 2 / 5 + 78,
       child: Column(
         children: [
