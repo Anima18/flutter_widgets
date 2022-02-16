@@ -73,6 +73,8 @@
     <!-- Permissions options for the `access notification policy` group -->
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
    <application
         android:label="flutter_widgets"
         android:icon="@mipmap/ic_launcher">

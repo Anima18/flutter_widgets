@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_widgets/util/hex_color.dart';
-
+import 'package:flutter/services.dart';
+import 'package:vibration/vibration.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'arithmetic_expression.dart';
 
 // ignore: must_be_immutable
@@ -28,6 +30,9 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
   @override
   void initState() {
     super.initState();
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+
     _inputController = StreamController.broadcast();
     _successController = StreamController.broadcast();
     _errorController = StreamController.broadcast();
@@ -70,61 +75,47 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: ScoreTipWidget(
-          successStream: _successController.stream,
-          errorStream: _errorController.stream,
-          key: scoreTipKey,
-        ),
-      ),
-      body: Stack(
-        children: [
-          /*...List.generate(
-              widget.strategy.puzzleCount,
-              (index) => Puzzle(
-                    inputStream: _inputController.stream,
-                    successController: _successController,
-                    errorController: _errorController,
-                    completeController: _completeController,
-                    strategy: widget.strategy,
-                  )).toList(),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Keyboard(_inputController),
-          )*/
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF96E3FF),
-                  Color(0xFF9EECFF),
-                  Color(0xFF9FEBFF),
-                  Color(0xFF9FEEFF),
-                  Color(0xFF9FECFF),
-                ],
-              ),
-              image: DecorationImage(
-                image: AssetImage('images/meditation.jpg'),
-                alignment: Alignment.bottomCenter,
-              ),
+    return Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF96E3FF),
+                Color(0xFF9EECFF),
+                Color(0xFF9FEBFF),
+                Color(0xFF9FEEFF),
+                Color(0xFF9FECFF),
+              ],
+            ),
+            image: DecorationImage(
+              image: AssetImage('images/meditation.jpg'),
+              alignment: Alignment.bottomCenter,
             ),
           ),
-          ...List.generate(
-              widget.strategy.puzzleCount,
-                  (index) => Puzzle(
-                inputStream: _inputController.stream,
-                successController: _successController,
-                errorController: _errorController,
-                completeController: _completeController,
-                strategy: widget.strategy,
-              )).toList(),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Keyboard(_inputController),
-          )
-        ],
-      ),
+          child: Align(
+            alignment: Alignment.center,
+            child: ScoreTipWidget(
+              successStream: _successController.stream,
+              errorStream: _errorController.stream,
+              key: scoreTipKey,
+            ),
+          ),
+        ),
+        ...List.generate(
+            widget.strategy.puzzleCount,
+            (index) => Puzzle(
+                  inputStream: _inputController.stream,
+                  successController: _successController,
+                  errorController: _errorController,
+                  completeController: _completeController,
+                  strategy: widget.strategy,
+                )).toList(),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Keyboard(_inputController),
+        )
+      ],
     );
   }
 }
@@ -147,7 +138,14 @@ class _ScoreTipWidgetState extends State<ScoreTipWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Text("你答对了$successCount条,答错了$errorCount条");
+    return Container(
+      child: Column(
+        children: [
+          Icon(Icons.stream),
+          Text("$successCount")
+        ],
+      ),
+    );
   }
 
   @override
@@ -192,6 +190,8 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
   late double top;
   late double left;
 
+  static AudioCache player = AudioCache();
+
   _reset() {
     expression = widget.strategy.expressions.removeLast();
     left = Random().nextDouble() * 300;
@@ -214,6 +214,7 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
       if (_controller.status == AnimationStatus.completed) {
         _controller.forward(from: 0.0);
         widget.errorController.add(1);
+        Vibration.vibrate();
         if (widget.strategy.expressions.length > 0) {
           _reset();
         } else {
@@ -226,6 +227,7 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
       if (_checkSuccess(event, expression)) {
         _controller.forward(from: 0.0);
         widget.successController.add(1);
+        player.play('clear.wav');
         if (widget.strategy.expressions.length > 0) {
           _reset();
         } else {
@@ -253,19 +255,19 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _controller.dispose();
+    player.clearAll();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     top = MediaQuery.of(context).size.height -
-        MediaQuery.of(context).size.width / 2 -
-        100;
+        MediaQuery.of(context).size.width / 2;
     return AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
           return Positioned(
-            top: top * _controller.value,
+            top: top * _controller.value - 30,
             left: left,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),

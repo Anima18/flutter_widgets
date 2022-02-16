@@ -56,6 +56,10 @@ dependencies:
   rxdart: ^0.26.0-nullsafety.1
   #权限申请
   permission_handler: ^8.3.0
+  #震动
+  vibration: ^1.7.4-nullsafety.0
+  #音频
+  audioplayers: ^0.20.1
 
 dev_dependencies:
   flutter_test:
@@ -78,18 +82,8 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - icons/
-    - icons/list_request_no_data.png
-    - icons/list_request_error.png
-    - icons/main.svg
-    - icons/ic_launcher.png
     - images/
-    - assets/flutter_logo.svg
-    - assets/dart.svg
-    - assets/test.html
-    - assets/ut.svg
-    - assets/ut2.svg
-    - assets/ic_arrow_drop_down.png
-
+    - assets/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
