@@ -23,9 +23,12 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
   late StreamController<int> _successController;
   late StreamController<int> _errorController;
   late StreamController<int> _completeController;
+  late StreamController<int> _wrongAnswerController;
 
   int completePuzzleCount = 0;
-  final GlobalKey scoreTipKey = GlobalKey();
+  int wrongAnswerPuzzleCount = 0;
+  final GlobalKey successTipKey = GlobalKey();
+  final GlobalKey errorTipKey = GlobalKey();
 
   @override
   void initState() {
@@ -37,18 +40,34 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
     _successController = StreamController.broadcast();
     _errorController = StreamController.broadcast();
     _completeController = StreamController();
+    _wrongAnswerController = StreamController();
+
+    _inputController.stream.listen((event) {
+      wrongAnswerPuzzleCount = 0;
+    });
+
+    _wrongAnswerController.stream.listen((event) {
+      wrongAnswerPuzzleCount += event;
+      if (wrongAnswerPuzzleCount == widget.strategy.puzzleCount) {
+        Vibration.vibrate();
+      }
+    });
+
     _completeController.stream.listen((event) {
       completePuzzleCount += event;
-      if (completePuzzleCount == 4) {
-        _ScoreTipWidgetState scoreState =
-            scoreTipKey.currentState as _ScoreTipWidgetState;
+      if (completePuzzleCount == widget.strategy.puzzleCount) {
+        _ScoreTipWidgetState successScoreState =
+            successTipKey.currentState as _ScoreTipWidgetState;
+        _ScoreTipWidgetState errorScoreState =
+            errorTipKey.currentState as _ScoreTipWidgetState;
         showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("完成"),
               content: Text(
-                  "你答对了${scoreState.successCount}条,答错了${scoreState.errorCount}条"),
+                  "你答对了${successScoreState.count}题,答错了${errorScoreState.count}题"),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -71,6 +90,7 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
     _successController.close();
     _errorController.close();
     _completeController.close();
+    _wrongAnswerController.close();
   }
 
   @override
@@ -93,12 +113,28 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
               alignment: Alignment.bottomCenter,
             ),
           ),
-          child: Align(
-            alignment: Alignment.center,
-            child: ScoreTipWidget(
-              successStream: _successController.stream,
-              errorStream: _errorController.stream,
-              key: scoreTipKey,
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ScoreTipWidget(
+                  stream: _successController.stream,
+                  iconData: Icons.done_all,
+                  key: successTipKey,
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                ScoreTipWidget(
+                  stream: _errorController.stream,
+                  iconData: Icons.close,
+                  key: errorTipKey,
+                ),
+              ],
             ),
           ),
         ),
@@ -109,6 +145,7 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
                   successController: _successController,
                   errorController: _errorController,
                   completeController: _completeController,
+                  wrongAnswerController: _wrongAnswerController,
                   strategy: widget.strategy,
                 )).toList(),
         Align(
@@ -121,11 +158,10 @@ class _ArithmeticPlayPageState extends State<ArithmeticPlayPage> {
 }
 
 class ScoreTipWidget extends StatefulWidget {
-  final Stream<int> successStream;
-  final Stream<int> errorStream;
+  final Stream<int> stream;
+  final IconData iconData;
 
-  ScoreTipWidget(
-      {Key? key, required this.successStream, required this.errorStream})
+  ScoreTipWidget({Key? key, required this.stream, required this.iconData})
       : super(key: key);
 
   @override
@@ -133,17 +169,14 @@ class ScoreTipWidget extends StatefulWidget {
 }
 
 class _ScoreTipWidgetState extends State<ScoreTipWidget> {
-  int successCount = 0;
-  int errorCount = 0;
+  int count = 0;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        children: [
-          Icon(Icons.stream),
-          Text("$successCount")
-        ],
+        mainAxisSize: MainAxisSize.min,
+        children: [Icon(widget.iconData), Text("$count")],
       ),
     );
   }
@@ -151,15 +184,9 @@ class _ScoreTipWidgetState extends State<ScoreTipWidget> {
   @override
   void initState() {
     super.initState();
-    widget.errorStream.listen((int event) {
+    widget.stream.listen((int event) {
       setState(() {
-        errorCount += event;
-      });
-    });
-
-    widget.successStream.listen((int event) {
-      setState(() {
-        successCount += event;
+        count += event;
       });
     });
   }
@@ -167,9 +194,15 @@ class _ScoreTipWidgetState extends State<ScoreTipWidget> {
 
 class Puzzle extends StatefulWidget {
   final Stream<int> inputStream;
+  //完成题目
   final StreamController<int> successController;
+  //丢失题目
   final StreamController<int> errorController;
+  //完成答题
   final StreamController<int> completeController;
+  //错误回答
+  final StreamController<int> wrongAnswerController;
+
   final ArithmeticStrategy strategy;
 
   Puzzle(
@@ -177,7 +210,8 @@ class Puzzle extends StatefulWidget {
       required this.successController,
       required this.errorController,
       required this.strategy,
-      required this.completeController});
+      required this.completeController,
+      required this.wrongAnswerController});
 
   @override
   _PuzzleState createState() => _PuzzleState();
@@ -214,7 +248,8 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
       if (_controller.status == AnimationStatus.completed) {
         _controller.forward(from: 0.0);
         widget.errorController.add(1);
-        Vibration.vibrate();
+        //Vibration.vibrate();
+        player.play("error.wav");
         if (widget.strategy.expressions.length > 0) {
           _reset();
         } else {
@@ -233,6 +268,8 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
         } else {
           _complete();
         }
+      } else {
+        widget.wrongAnswerController.add(1);
       }
     });
   }
