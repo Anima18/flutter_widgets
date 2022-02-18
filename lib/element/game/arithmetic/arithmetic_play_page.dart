@@ -299,7 +299,7 @@ class _PuzzleState extends State<Puzzle> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     top = MediaQuery.of(context).size.height -
-        MediaQuery.of(context).size.width / 2;
+        MediaQuery.of(context).size.width / 3 / 5 *2 * 4 - 28;
     return AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
@@ -338,6 +338,7 @@ class _KeyboardState extends State<Keyboard> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
+          height: 28,
           alignment: Alignment.center,
           child: Text("$inputValue", style: TextStyle(fontSize: 20),),
         ),
@@ -347,6 +348,7 @@ class _KeyboardState extends State<Keyboard> {
           childAspectRatio: 5 / 2,
           mainAxisSpacing: 0,
           crossAxisSpacing: 0,
+          padding: EdgeInsets.all(0),
           children: [
             ...List.generate(
                 9,
