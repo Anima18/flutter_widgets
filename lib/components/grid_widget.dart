@@ -14,8 +14,21 @@ class GridWidget extends StatelessWidget {
 
   Widget _contentWidget() {
     return Container(
-
-      child: GridView.count(
+      color: Colors.blue,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("hello world", style: TextStyle(fontSize: 20),),
+          GridView.count(
+            childAspectRatio: 2,
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            children: List.generate(10, (index) => Center(child: Text("$index")))
+                .toList(),
+          ),
+        ],
+      ),
+      /*child: GridView.count(
         crossAxisCount: 3,
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
@@ -104,7 +117,7 @@ class GridWidget extends StatelessWidget {
               scale: 1,
               fit: BoxFit.cover),
         ],
-      ),
+      ),*/
     );
   }
 }

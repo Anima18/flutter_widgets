@@ -334,62 +334,58 @@ class _KeyboardState extends State<Keyboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      //color: HexColor.fromHex("#f2f3f6"),
-      height: MediaQuery.of(context).size.width * 2 / 5 + 78,
-      child: Column(
-        children: [
-          Container(
-            height: 28,
-            alignment: Alignment.center,
-            child: Text("$inputValue"),
-          ),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            childAspectRatio: 5 / 2,
-            mainAxisSpacing: 0,
-            crossAxisSpacing: 0,
-            children: [
-              ...List.generate(
-                  9,
-                  (index) => TextButton(
-                        onPressed: () {
-                          valueItems.add("${index + 1}");
-                          _updateInputValue();
-                        },
-                        child: Text(
-                          "${index + 1}",
-                          style: TextStyle(color: Colors.black, fontSize: 20),
-                        ),
-                      )).toList(),
-              TextButton(
-                  onPressed: () {
-                    valueItems.add("-");
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          alignment: Alignment.center,
+          child: Text("$inputValue", style: TextStyle(fontSize: 20),),
+        ),
+        GridView.count(
+          crossAxisCount: 3,
+          shrinkWrap: true,
+          childAspectRatio: 5 / 2,
+          mainAxisSpacing: 0,
+          crossAxisSpacing: 0,
+          children: [
+            ...List.generate(
+                9,
+                (index) => TextButton(
+                      onPressed: () {
+                        valueItems.add("${index + 1}");
+                        _updateInputValue();
+                      },
+                      child: Text(
+                        "${index + 1}",
+                        style: TextStyle(color: Colors.black, fontSize: 20),
+                      ),
+                    )).toList(),
+            TextButton(
+                onPressed: () {
+                  valueItems.add("-");
+                  _updateInputValue();
+                },
+                child: Text("-",
+                    style: TextStyle(color: Colors.black, fontSize: 20))),
+            TextButton(
+                onPressed: () {
+                  valueItems.add("0");
+                  _updateInputValue();
+                },
+                child: Text("0",
+                    style: TextStyle(color: Colors.black, fontSize: 20))),
+            TextButton(
+                onPressed: () {
+                  if (inputValue.isNotEmpty) {
+                    widget.controller.add(int.parse(inputValue));
+                    valueItems.clear();
                     _updateInputValue();
-                  },
-                  child: Text("-",
-                      style: TextStyle(color: Colors.black, fontSize: 20))),
-              TextButton(
-                  onPressed: () {
-                    valueItems.add("0");
-                    _updateInputValue();
-                  },
-                  child: Text("0",
-                      style: TextStyle(color: Colors.black, fontSize: 20))),
-              TextButton(
-                  onPressed: () {
-                    if (inputValue.isNotEmpty) {
-                      widget.controller.add(int.parse(inputValue));
-                      valueItems.clear();
-                      _updateInputValue();
-                    }
-                  },
-                  child: Icon(Icons.done)),
-            ],
-          ),
-        ],
-      ),
+                  }
+                },
+                child: Icon(Icons.done)),
+          ],
+        ),
+      ],
     );
   }
 
