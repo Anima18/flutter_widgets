@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/element/game/color_sorted_page2.dart';
+import 'package:flutter_widgets/element/game/shooting/shooting_demo.dart';
 
 import 'arithmetic/arithmetic_game_page.dart';
 import 'color_sorted_page.dart';
@@ -43,6 +44,15 @@ class GameListPage extends StatelessWidget {
                 child: Text("算术游戏",),
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ArithmeticGamePage()));
+                },
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              child: OutlinedButton(
+                child: Text("射击游戏",),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_)=>PanDemo()));
                 },
               ),
             ),

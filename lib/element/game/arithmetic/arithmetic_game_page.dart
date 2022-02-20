@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_widgets/element/game/arithmetic/arithmetic_expression.dart';
 import 'package:flutter_widgets/element/game/arithmetic/arithmetic_play_page.dart';
 
@@ -7,6 +8,7 @@ class ArithmeticGamePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text("游戏"),
@@ -26,7 +28,7 @@ class ArithmeticGamePage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => ArithmeticPlayPage(
-                          ArithmeticStrategyFactory.getSimpleAddStrategy())));
+                          ArithmeticStrategyFactory.getSimpleAddStrategy()))).then((value) => SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
                 },
               ),
             ),
@@ -39,7 +41,7 @@ class ArithmeticGamePage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => ArithmeticPlayPage(
-                          ArithmeticStrategyFactory.getSimpleReduceStrategy())));
+                          ArithmeticStrategyFactory.getSimpleReduceStrategy()))).then((value) => SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
                 },
               ),
             ),
@@ -52,7 +54,7 @@ class ArithmeticGamePage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => ArithmeticPlayPage(
-                          ArithmeticStrategyFactory.getSimpleAddAndReduceStrategy())));
+                          ArithmeticStrategyFactory.getSimpleAddAndReduceStrategy()))).then((value) => SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
                 },
               ),
             ),
