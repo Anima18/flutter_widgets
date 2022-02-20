@@ -109,7 +109,15 @@ class _FighterState extends State<Fighter> {
 
     //发射子弹
     Timer.periodic(Duration(milliseconds: 100), (timer) {
-      widget.bullttsController.add(Bullet(fighterState: this));
+      List<Bullet> loadedBullets = widget.bulltts.where((element) => element.status==BulletStatus.loaded).toList();
+      if(loadedBullets.length != 0) {
+        loadedBullets[0].shooting();
+        print("=======reset=========");
+      }else {
+        widget.bullttsController.add(Bullet(fighterState: this));
+        print("=======create=========");
+      }
+
       this.timer = timer;
     });
   }
@@ -150,11 +158,18 @@ enum BulletStatus {
 class Bullet extends StatefulWidget {
   BulletStatus status = BulletStatus.loaded;
   final _FighterState fighterState;
+
+  final _BulletState bulletState = _BulletState();
+
   Bullet({Key? key, required this.fighterState})
       : super(key: key);
 
+  void shooting() {
+    bulletState.shooting();
+  }
+
   @override
-  _BulletState createState() => _BulletState();
+  _BulletState createState() => bulletState;
 }
 
 class _BulletState extends State<Bullet> with SingleTickerProviderStateMixin {
@@ -163,17 +178,23 @@ class _BulletState extends State<Bullet> with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late double width = 10.0;
 
-  @override
-  void initState() {
-    super.initState();
+  void shooting() {
     widget.status = BulletStatus.shooting;
     top = widget.fighterState.top;
     left = widget.fighterState.left + widget.fighterState.width / 2 - width/2;
+
+    controller.forward();
+  }
+
+  @override
+  void initState() {
+    super.initState();
     controller =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
-    controller.forward();
+    shooting();
     controller.addListener(() {
       if (controller.status == AnimationStatus.completed) {
+        print("=======completed=========");
         widget.status = BulletStatus.loaded;
       }
     });
