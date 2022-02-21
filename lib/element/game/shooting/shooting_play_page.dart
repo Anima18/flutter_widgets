@@ -1,31 +1,69 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_widgets/element/game/shooting/enemy_plane.dart';
 
-class PanDemo extends StatefulWidget {
-  const PanDemo({Key? key}) : super(key: key);
+import 'bullet.dart';
+import 'fighter.dart';
+
+class ShootPlayPage extends StatefulWidget {
+  final Size size;
+  const ShootPlayPage({Key? key, required this.size}) : super(key: key);
 
   @override
-  _PanDemoState createState() => _PanDemoState();
+  _ShootPlayPageState createState() => _ShootPlayPageState();
 }
 
-class _PanDemoState extends State<PanDemo> {
+class _ShootPlayPageState extends State<ShootPlayPage> {
   late StreamController<DragUpdateDetails> _streamController;
   late StreamController<Bullet> _bulletController;
+  late StreamController _hitController;
 
-  List<Bullet> bulltts = [];
+  List<Bullet> bullets = [];
+  List<EnemyPlane> enemyPlanes = [];
 
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+
     _streamController = StreamController.broadcast();
     _bulletController = StreamController();
+    _hitController = StreamController();
 
     _bulletController.stream.listen((bullet) {
       setState(() {
-        bulltts.add(bullet);
+        bullets.add(bullet);
       });
     });
+
+    _hitController.stream.listen((event) {
+      enemyPlanes.forEach((enemyPlane) {
+        RenderBox enemyRenderBox =
+        enemyPlane.planeState.context.findRenderObject() as RenderBox;
+        var enemyOffset = enemyRenderBox.localToGlobal(Offset.zero);
+
+        print("${enemyOffset.dx}=======${enemyOffset.dy}");
+
+        bullets.forEach((bullet) {
+          RenderBox bulletRenderBox =
+          bullet.bulletState.context.findRenderObject() as RenderBox;
+          var bulletOffset = bulletRenderBox.localToGlobal(Offset.zero);
+          if ((enemyOffset.dy <= bulletOffset.dy &&
+              bulletOffset.dy <= enemyOffset.dy + enemyPlaneWidth) &&
+              (enemyOffset.dx <= bulletOffset.dx &&
+                  bulletOffset.dx <= enemyOffset.dx + enemyPlaneWidth)) {
+            bullet.shooting();
+            enemyPlane.beHit();
+          }
+        });
+      });
+    });
+
+    enemyPlanes.add(EnemyPlane(widget.size));
+    enemyPlanes.add(EnemyPlane(widget.size));
+    enemyPlanes.add(EnemyPlane(widget.size));
   }
 
   @override
@@ -33,11 +71,11 @@ class _PanDemoState extends State<PanDemo> {
     super.dispose();
     _streamController.close();
     _bulletController.close();
+    _hitController.close();
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return GestureDetector(
         onPanUpdate: _onPanUpdate,
         child: Container(
@@ -45,12 +83,17 @@ class _PanDemoState extends State<PanDemo> {
           child: Stack(
             children: [
               Fighter(
-                size: size,
+                size: widget.size,
                 dragUpdateStream: _streamController.stream,
-                bulltts: bulltts,
-                bullttsController: _bulletController,
+                bullets: bullets,
+                bulletsController: _bulletController,
+                hitController: _hitController,
               ),
-              ...bulltts
+              ...bullets,
+              ...enemyPlanes,
+              /* EnemyPlane(widget.size),
+              EnemyPlane(widget.size),
+              EnemyPlane(widget.size),*/
             ],
           ),
         ));
@@ -61,6 +104,7 @@ class _PanDemoState extends State<PanDemo> {
   }
 }
 
+/*
 class Fighter extends StatefulWidget {
   final Size size;
   final Stream<DragUpdateDetails> dragUpdateStream;
@@ -112,10 +156,8 @@ class _FighterState extends State<Fighter> {
       List<Bullet> loadedBullets = widget.bulltts.where((element) => element.status==BulletStatus.loaded).toList();
       if(loadedBullets.length != 0) {
         loadedBullets[0].shooting();
-        print("=======reset=========");
       }else {
         widget.bullttsController.add(Bullet(fighterState: this));
-        print("=======create=========");
       }
 
       this.timer = timer;
@@ -183,7 +225,7 @@ class _BulletState extends State<Bullet> with SingleTickerProviderStateMixin {
     top = widget.fighterState.top;
     left = widget.fighterState.left + widget.fighterState.width / 2 - width/2;
 
-    controller.forward();
+    controller.forward(from: 0.0);
   }
 
   @override
@@ -194,7 +236,6 @@ class _BulletState extends State<Bullet> with SingleTickerProviderStateMixin {
     shooting();
     controller.addListener(() {
       if (controller.status == AnimationStatus.completed) {
-        print("=======completed=========");
         widget.status = BulletStatus.loaded;
       }
     });
@@ -224,3 +265,4 @@ class _BulletState extends State<Bullet> with SingleTickerProviderStateMixin {
     );
   }
 }
+*/

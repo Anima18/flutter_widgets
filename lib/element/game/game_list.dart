@@ -1,7 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_widgets/element/game/color_sorted_page2.dart';
-import 'package:flutter_widgets/element/game/shooting/shooting_demo.dart';
+import 'package:flutter_widgets/element/game/shooting/shooting_play_page.dart';
 
 import 'arithmetic/arithmetic_game_page.dart';
 import 'color_sorted_page.dart';
@@ -10,6 +11,7 @@ class GameListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text("游戏"),
@@ -52,7 +54,7 @@ class GameListPage extends StatelessWidget {
               child: OutlinedButton(
                 child: Text("射击游戏",),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_)=>PanDemo()));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ShootPlayPage(size: size,))).then((value) => SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
                 },
               ),
             ),
