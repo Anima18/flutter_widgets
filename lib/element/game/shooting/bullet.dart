@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_widgets/element/game/shooting/fighter.dart';
 
 enum BulletStatus {
@@ -69,7 +70,9 @@ class _BulletState extends State<Bullet> with SingleTickerProviderStateMixin {
           child: Container(
             width: width,
             height: width,
-            color: Colors.black,
+            child: Image(
+              image: AssetImage("images/bullet.png"),
+            ),
           ),
         );
       },

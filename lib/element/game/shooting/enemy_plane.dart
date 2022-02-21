@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-const double enemyPlaneWidth = 30.0;
+const double enemyPlaneWidth = 40.0;
 class EnemyPlane extends StatefulWidget {
   final Size size;
   final _EnemyPlaneState planeState = _EnemyPlaneState();
@@ -22,7 +22,7 @@ class _EnemyPlaneState extends State<EnemyPlane> with SingleTickerProviderStateM
   late double left;
 
   void reset() {
-    left = Random().nextDouble() * widget.size.width;
+    left = Random().nextDouble() * (widget.size.width - enemyPlaneWidth);
     controller.forward(from: 0.0);
   }
 
@@ -58,7 +58,9 @@ class _EnemyPlaneState extends State<EnemyPlane> with SingleTickerProviderStateM
           child: Container(
             width: enemyPlaneWidth,
             height: enemyPlaneWidth,
-            color: Colors.blue,
+            child: Image(
+              image: AssetImage("images/enemy_plane.png"),
+            ),
           ),
         );
       },

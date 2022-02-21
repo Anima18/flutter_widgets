@@ -19,6 +19,7 @@ class _ShootPlayPageState extends State<ShootPlayPage> {
   late StreamController<DragUpdateDetails> _streamController;
   late StreamController<Bullet> _bulletController;
   late StreamController _hitController;
+  late Timer hitTimer;
 
   List<Bullet> bullets = [];
   List<EnemyPlane> enemyPlanes = [];
@@ -34,33 +35,36 @@ class _ShootPlayPageState extends State<ShootPlayPage> {
 
     _bulletController.stream.listen((bullet) {
       setState(() {
+        print("=========create=============");
         bullets.add(bullet);
       });
     });
-
-    _hitController.stream.listen((event) {
+    Timer.periodic(Duration(milliseconds: 10), (timer) {
       enemyPlanes.forEach((enemyPlane) {
         RenderBox enemyRenderBox =
         enemyPlane.planeState.context.findRenderObject() as RenderBox;
         var enemyOffset = enemyRenderBox.localToGlobal(Offset.zero);
-
-        print("${enemyOffset.dx}=======${enemyOffset.dy}");
-
         bullets.forEach((bullet) {
-          RenderBox bulletRenderBox =
-          bullet.bulletState.context.findRenderObject() as RenderBox;
-          var bulletOffset = bulletRenderBox.localToGlobal(Offset.zero);
-          if ((enemyOffset.dy <= bulletOffset.dy &&
-              bulletOffset.dy <= enemyOffset.dy + enemyPlaneWidth) &&
-              (enemyOffset.dx <= bulletOffset.dx &&
-                  bulletOffset.dx <= enemyOffset.dx + enemyPlaneWidth)) {
-            bullet.shooting();
-            enemyPlane.beHit();
+          if(bullet.status == BulletStatus.shooting) {
+            RenderBox bulletRenderBox =
+            bullet.bulletState.context.findRenderObject() as RenderBox;
+            var bulletOffset = bulletRenderBox.localToGlobal(Offset.zero);
+            if ((enemyOffset.dy <= bulletOffset.dy &&
+                bulletOffset.dy <= enemyOffset.dy + enemyPlaneWidth) &&
+                (enemyOffset.dx <= bulletOffset.dx &&
+                    bulletOffset.dx <= enemyOffset.dx + enemyPlaneWidth)) {
+              bullet.shooting();
+              enemyPlane.beHit();
+            }
           }
         });
       });
+      hitTimer = timer;
     });
+    /*_hitController.stream.listen((event) {
 
+    });
+*/
     enemyPlanes.add(EnemyPlane(widget.size));
     enemyPlanes.add(EnemyPlane(widget.size));
     enemyPlanes.add(EnemyPlane(widget.size));
@@ -72,31 +76,34 @@ class _ShootPlayPageState extends State<ShootPlayPage> {
     _streamController.close();
     _bulletController.close();
     _hitController.close();
+    hitTimer.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onPanUpdate: _onPanUpdate,
-        child: Container(
-          color: Colors.white,
-          child: Stack(
-            children: [
-              Fighter(
-                size: widget.size,
-                dragUpdateStream: _streamController.stream,
-                bullets: bullets,
-                bulletsController: _bulletController,
-                hitController: _hitController,
-              ),
-              ...bullets,
-              ...enemyPlanes,
-              /* EnemyPlane(widget.size),
-              EnemyPlane(widget.size),
-              EnemyPlane(widget.size),*/
-            ],
-          ),
-        ));
+    return SafeArea(
+      child: GestureDetector(
+          onPanUpdate: _onPanUpdate,
+          child: Container(
+            color: Colors.white,
+            child: Stack(
+              children: [
+                Fighter(
+                  size: widget.size,
+                  dragUpdateStream: _streamController.stream,
+                  bullets: bullets,
+                  bulletsController: _bulletController,
+                  hitController: _hitController,
+                ),
+                ...bullets,
+                ...enemyPlanes,
+                /* EnemyPlane(widget.size),
+                EnemyPlane(widget.size),
+                EnemyPlane(widget.size),*/
+              ],
+            ),
+          )),
+    );
   }
 
   void _onPanUpdate(DragUpdateDetails details) {

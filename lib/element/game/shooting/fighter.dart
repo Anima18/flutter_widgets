@@ -27,7 +27,7 @@ class Fighter extends StatefulWidget {
 class FighterState extends State<Fighter> {
   late double top;
   late double left;
-  late double width = 50.0;
+  late double width = 70.0;
   late Timer timer;
 
   @override
@@ -67,8 +67,6 @@ class FighterState extends State<Fighter> {
       } else {
         widget.bulletsController.add(Bullet(fighterState: this));
       }
-
-      widget.hitController.add(true);
       this.timer = timer;
     });
   }
@@ -90,9 +88,11 @@ class FighterState extends State<Fighter> {
       top: top,
       left: left,
       child: Container(
-        width: 50,
-        height: 50,
-        color: Colors.red,
+        width: width,
+        height: width,
+        child: Image(
+          image: AssetImage("images/fighter.png"),
+        ),
       ),
     );
   }
