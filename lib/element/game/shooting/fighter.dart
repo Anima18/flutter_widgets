@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import 'bullet.dart';
@@ -29,10 +30,13 @@ class FighterState extends State<Fighter> {
   late double left;
   late double width = 70.0;
   late Timer timer;
+  static AudioCache player = AudioCache();
 
   @override
   void initState() {
     super.initState();
+
+    //player.loop("fighter_shooting.wav");
     top = widget.size.height - width;
     left = (widget.size.width - width) / 2;
 
@@ -75,6 +79,7 @@ class FighterState extends State<Fighter> {
   void dispose() {
     super.dispose();
     timer.cancel();
+    //player.clearAll();
   }
 
   String parserOffset(Offset offset) {

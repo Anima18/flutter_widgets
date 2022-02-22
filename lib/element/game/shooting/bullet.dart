@@ -65,7 +65,7 @@ class _BulletState extends State<Bullet> with SingleTickerProviderStateMixin {
       animation: controller,
       builder: (BuildContext context, Widget? child) {
         return Positioned(
-          top: top - top*controller.value,
+          top: top - top*controller.value - 10,
           left: left,
           child: Container(
             width: width,

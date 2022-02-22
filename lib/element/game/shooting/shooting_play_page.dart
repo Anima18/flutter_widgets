@@ -85,6 +85,21 @@ class _ShootPlayPageState extends State<ShootPlayPage> {
       child: GestureDetector(
           onPanUpdate: _onPanUpdate,
           child: Container(
+            /*decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF96E3FF),
+                  Color(0xFF9EECFF),
+                  Color(0xFF9FEBFF),
+                  Color(0xFF9FEEFF),
+                  Color(0xFF9FECFF),
+                ],
+              ),
+              image: DecorationImage(
+                image: AssetImage('images/battleground.jpg'),
+                alignment: Alignment.bottomCenter,
+              ),
+            ),*/
             color: Colors.white,
             child: Stack(
               children: [

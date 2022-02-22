@@ -53,7 +53,7 @@ class _EnemyPlaneState extends State<EnemyPlane> with SingleTickerProviderStateM
       animation: controller,
       builder: (BuildContext context, Widget? child) {
         return Positioned(
-          top: widget.size.height*controller.value + enemyPlaneWidth,
+          top: (widget.size.height+enemyPlaneWidth)*controller.value - enemyPlaneWidth,
           left: left,
           child: Container(
             width: enemyPlaneWidth,
