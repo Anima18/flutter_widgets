@@ -30,13 +30,13 @@ class FighterState extends State<Fighter> {
   late double left;
   late double width = 70.0;
   late Timer timer;
-  static AudioCache player = AudioCache();
+  late AudioPlayer player;
 
   @override
   void initState() {
     super.initState();
 
-    //player.loop("fighter_shooting.wav");
+
     top = widget.size.height - width;
     left = (widget.size.width - width) / 2;
 
@@ -73,13 +73,18 @@ class FighterState extends State<Fighter> {
       }
       this.timer = timer;
     });
+    WidgetsBinding.instance?.addPostFrameCallback((_) async{
+      player = await AudioCache().loop("fighter_shooting.wav");
+    });
+
   }
 
   @override
   void dispose() {
     super.dispose();
     timer.cancel();
-    //player.clearAll();
+    player.stop();
+    player.dispose();
   }
 
   String parserOffset(Offset offset) {
