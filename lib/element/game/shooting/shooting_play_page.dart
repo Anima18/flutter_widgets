@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widgets/element/game/shooting/enemy_plane.dart';
@@ -23,6 +24,8 @@ class _ShootPlayPageState extends State<ShootPlayPage> {
 
   List<Bullet> bullets = [];
   List<EnemyPlane> enemyPlanes = [];
+
+  late AudioPlayer player;
 
   @override
   void initState() {
@@ -61,13 +64,13 @@ class _ShootPlayPageState extends State<ShootPlayPage> {
       });
       hitTimer = timer;
     });
-    /*_hitController.stream.listen((event) {
+    enemyPlanes.add(EnemyPlane(widget.size));
+    enemyPlanes.add(EnemyPlane(widget.size));
+    enemyPlanes.add(EnemyPlane(widget.size));
 
+    WidgetsBinding.instance?.addPostFrameCallback((_) async{
+      player = await AudioCache().loop("backgroudMusic.wav");
     });
-*/
-    enemyPlanes.add(EnemyPlane(widget.size));
-    enemyPlanes.add(EnemyPlane(widget.size));
-    enemyPlanes.add(EnemyPlane(widget.size));
   }
 
   @override
@@ -77,6 +80,8 @@ class _ShootPlayPageState extends State<ShootPlayPage> {
     _bulletController.close();
     _hitController.close();
     hitTimer.cancel();
+    player.stop();
+    player.dispose();
   }
 
   @override

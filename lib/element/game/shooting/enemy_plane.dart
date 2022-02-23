@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 const double enemyPlaneWidth = 40.0;
@@ -10,7 +11,7 @@ class EnemyPlane extends StatefulWidget {
   EnemyPlane(this.size);
 
   void beHit() {
-    planeState.reset();
+    planeState.beHit();
   }
 
   @override
@@ -20,10 +21,13 @@ class EnemyPlane extends StatefulWidget {
 class _EnemyPlaneState extends State<EnemyPlane> with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late double left;
-
   void reset() {
     left = Random().nextDouble() * (widget.size.width - enemyPlaneWidth);
     controller.forward(from: 0.0);
+  }
+
+  void beHit() {
+    reset();
   }
 
   @override
